@@ -1,0 +1,1263 @@
+ <!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>পোস্ট ম্যানেজমেন্ট</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .post-status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+    
+    .status-published {
+      background-color: #4caf50;
+      color: white;
+    }
+    
+    .status-draft {
+      background-color: #ff9800;
+      color: white;
+    }
+    
+    .search-filter {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2196F3;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+      gap: 10px;
+    }
+    
+    .page-btn {
+      padding: 8px 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+    }
+    
+    .page-btn.active {
+      background: #2196F3;
+      color: white;
+      border-color: #2196F3;
+    }
+    
+    @media (max-width: 768px) {
+      .search-filter {
+        flex-direction: column;
+      }
+      
+      .stats-cards {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    /* Table Responsive Styling */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* যাতে মোবাইলেও scroll আসে */
+}
+
+.table th,
+.table td {
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap; /* mobile এ টেক্সট wrap না হয় */
+}
+
+.table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Mobile view optimization */
+@media (max-width: 768px) {
+  .table th,
+  .table td {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .admin-actions {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .btn-sm {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .search-filter {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .table {
+    min-width: 500px;
+  }
+}
+ :root { 
+  --brand:#006d63; 
+  --brand-light: #008577;
+  --brand-dark: #00554d;
+  --ink:#1f2937; 
+  --muted:#6b7280; 
+  --bg:#f8fafc; 
+  --card:#ffffff;
+  --border:#e5e7eb;
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+}
+
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans Bengali",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+a{text-decoration:none;color:inherit}
+.container{max-width:1200px;margin:0 auto;padding:0 16px}
+
+/* Header */
+.header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.brand{font-weight:800;font-size:28px;color:var(--brand);letter-spacing:.5px}
+.nav-toggle{display:none;background:none;border:none;font-size:24px;cursor:pointer}
+.nav{display:flex;gap:24px}
+.nav-link{padding:8px 0;font-weight:600;color:var(--ink);position:relative;transition:color 0.3s}
+.nav-link:hover{color:var(--brand)}
+.nav-link.active{color:var(--brand)}
+.nav-link.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--brand);border-radius:3px 3px 0 0}
+.header-actions{display:flex;gap:12px;align-items:center}
+.search-form{position:relative;display:flex;align-items:center}
+.search-input{width:220px;padding:10px 16px 10px 40px;border:1px solid var(--border);border-radius:50px;font-size:14px;transition:all 0.3s}
+.search-input:focus{outline:none;border-color:var(--brand);width:260px;box-shadow:0 0 0 3px rgba(0,109,99,0.1)}
+.search-icon{position:absolute;left:14px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;transition:all 0.3s;border:none}
+.btn-primary{background:var(--brand);color:white}
+.btn-primary:hover{background:var(--brand-light)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--ink)}
+.btn-outline:hover{background:var(--bg);border-color:var(--brand);color:var(--brand)}
+.btn-icon{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--bg);color:var(--ink);border:1px solid var(--border);cursor:pointer;transition:all 0.3s}
+.btn-icon:hover{background:var(--brand);color:white;border-color:var(--brand)}
+
+/* Hero Section */
+.hero{background:linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1495020689067-958852a7765e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');background-size:cover;background-position:center;color:white;padding:80px 0;margin-bottom:40px;border-radius:0 0 16px 16px}
+.hero-content{max-width:700px}
+.hero-title{font-size:2.8rem;margin:0 0 16px;line-height:1.2}
+.hero-desc{font-size:1.2rem;margin:0 0 32px;opacity:0.9}
+
+/* Content Layout */
+.content-wrapper{display:grid;grid-template-columns:1fr 350px;gap:30px;margin:40px 0}
+.main-content{width:100%}
+.sidebar{width:100%}
+
+/* Cards */
+.section-title{font-size:1.5rem;margin:0 0 24px;padding-bottom:12px;border-bottom:2px solid var(--brand);display:inline-block}
+.grid{display:grid;gap:24px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.04);transition:transform 0.3s, box-shadow 0.3s}
+.card:hover{transform:translateY(-5px);box-shadow:0 10px 20px rgba(0,0,0,0.08)}
+.card-large{grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr;gap:0}
+.thumb{width:100%;height:100%;object-fit:cover;background:#eef2f7}
+.card-body{padding:20px}
+.title{font-size:1.4rem;line-height:1.3;margin:0 0 12px;font-weight:700}
+.card-large .title{font-size:1.8rem}
+.excerpt{color:var(--muted);margin:0 0 16px;line-height:1.6}
+.meta{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:14px}
+.meta-dot{width:4px;height:4px;border-radius:999px;background:#cbd5e1}
+.category-tag{display:inline-block;padding:4px 12px;background:var(--brand);color:white;border-radius:50px;font-size:12px;font-weight:600;margin-bottom:12px}
+
+/* Sidebar */
+.sidebar-widget{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px}
+.widget-title{font-size:1.2rem;margin:0 0 16px;padding-bottom:8px;border-bottom:2px solid var(--brand);display:inline-block}
+.trending-list{list-style:none;padding:0;margin:0}
+.trending-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.trending-item:last-child{border-bottom:none}
+.trending-num{font-size:1.2rem;font-weight:700;color:var(--brand);min-width:30px}
+.trending-content{flex:1}
+.trending-title{font-size:1rem;margin:0 0 4px;font-weight:600;line-height:1.3}
+
+/* Footer */
+.footer{background:#111827;color:white;padding:60px 0 30px;margin-top:60px}
+.footer-grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:30px}
+.footer-brand{font-size:1.8rem;font-weight:800;margin:0 0 16px;color:white}
+.footer-desc{color:#9ca3af;margin:0 0 24px;line-height:1.6}
+.footer-title{font-size:1.1rem;margin:0 0 20px;position:relative;padding-bottom:10px}
+.footer-title::after{content:'';position:absolute;bottom:0;left:0;width:40px;height:3px;background:var(--brand)}
+.footer-links{list-style:none;padding:0;margin:0}
+.footer-link{margin-bottom:12px}
+.footer-link a{color:#9ca3af;transition:color 0.3s}
+.footer-link a:hover{color:var(--brand)}
+.social-links{display:flex;gap:12px;margin-top:20px}
+.social-link{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#1f2937;color:white;transition:all 0.3s}
+.social-link:hover{background:var(--brand);transform:translateY(-3px)}
+.copyright{text-align:center;padding-top:30px;margin-top:30px;border-top:1px solid #374151;color:#9ca3af;font-size:14px}
+
+/* Modal */
+.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;visibility:hidden;transition:all 0.3s}
+.modal.open{opacity:1;visibility:visible}
+.modal-content{background:white;border-radius:12px;width:90%;max-width:500px;max-height:90vh;overflow:auto;transform:translateY(20px);transition:transform 0.3s}
+.modal.open .modal-content{transform:translateY(0)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px;border-bottom:1px solid var(--border)}
+.modal-title{font-size:1.3rem;margin:0;font-weight:700}
+.modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);transition:color 0.3s}
+.modal-close:hover{color:var(--error)}
+.modal-body{padding:20px}
+
+/* Form Elements */
+.form-group{margin-bottom:20px}
+.form-label{display:block;margin-bottom:8px;font-weight:600}
+.form-input,.form-textarea,.form-select{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:8px;font-size:16px;transition:all 0.3s}
+.form-input:focus,.form-textarea:focus,.form-select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,109,99,0.1)}
+.form-textarea{min-height:120px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.form-actions{display:flex;gap:12px;margin-top:24px}
+.form-message{padding:12px;border-radius:8px;margin:16px 0}
+.form-message.success{background:rgba(16,185,129,0.1);color:var(--success);border:1px solid var(--success)}
+.form-message.error{background:rgba(239,68,68,0.1);color:var(--error);border:1px solid var(--error)}
+
+/* Admin Panel */
+.admin-panel{position:fixed;bottom:20px;right:20px;z-index:900}
+.admin-fab{width:60px;height:60px;border-radius:50%;background:var(--brand);color:white;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.2);transition:all 0.3s;border:none}
+.admin-fab:hover{background:var(--brand-light);transform:scale(1.1)}
+.admin-drawer{position:fixed;bottom:90px;right:20px;width:350px;background:white;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.15);transform:translateY(calc(100% + 100px));transition:transform 0.4s;z-index:10000;overflow:hidden}
+.admin-drawer.open{transform:translateY(0)}
+.admin-header{background:var(--brand);color:white;padding:16px;display:flex;align-items:center;justify-content:space-between}
+.admin-title{font-size:1.2rem;margin:0;font-weight:600}
+.admin-close{background:none;border:none;color:white;font-size:20px;cursor:pointer}
+.admin-body{padding:20px;max-height:60vh;overflow:auto}
+
+/* User dropdown */
+.user-menu{position:relative}
+.user-dropdown{position:absolute;top:100%;right:0;width:200px;background:white;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:8px 0;z-index:10000;margin-top:8px;opacity:0;visibility:hidden;transform:translateY(10px);transition:all 0.3s}
+.user-menu.open .user-dropdown{opacity:1;visibility:visible;transform:translateY(0)}
+.dropdown-item{display:flex;align-items:center;gap:12px;padding:10px 16px;color:var(--ink);transition:all 0.3s;cursor:pointer}
+.dropdown-item:hover{background:var(--bg);color:var(--brand)}
+.dropdown-divider{height:1px;background:var(--border);margin:4px 0}
+
+/* Responsive */
+@media (max-width:1024px){
+  .content-wrapper{grid-template-columns:1fr 280px}
+  .hero-title{font-size:2.rem}
+}
+@media (max-width:768px){
+  .header-inner{padding:12px 0}
+  .nav-toggle{display:block}
+  .nav{position:fixed;top:70px;left:0;right:0;background:white;flex-direction:column;padding:20px;box-shadow:0 10px 20px rgba(0,0,0,0.1);transform:translateY(-100%);opacity:0;visibility:hidden;transition:all 0.3s;z-index:99}
+  .nav.open{transform:translateY(0);opacity:1;visibility:visible}
+  .search-form{display:none}
+  .content-wrapper{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .hero{padding:60px 0}
+  .hero-title{font-size:1.8rem}
+  .hero-desc{font-size:1rem}
+  .footer-grid{grid-template-columns:repeat(2, 1fr);gap:30px 20px}
+  .form-row{grid-template-columns:1fr}
+  .user-dropdown{right:-20px;left:auto}
+}
+@media (max-width:576px){
+  .brand{font-size:22px}
+  .card-large{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .admin-drawer{width:90%;right:5%;left:5%}
+  .user-dropdown{right:-60px}
+}
+
+/* Utility Classes */
+.text-center{text-align:center}
+.mb-0{margin-bottom:0}
+.mt-0{margin-top:0}
+.hidden{display:none}
+.visible{display:block}
+/* Responsive user menu */
+@media (max-width:768px){
+  .user-menu {
+    width: 100%; /* Take full width on mobile */
+    display: flex;
+    justify-content: flex-end; /* Keep it right aligned */
+  }
+
+  .user-menu button {
+    width: auto;
+    font-size: 14px;
+    padding: 8px 1px;
+  }
+
+  .user-dropdown {
+    right: 0; /* Align dropdown to the button */
+    left: auto;
+    width: 200px; /* Or max-width: 90% for really small screens */
+  }
+}
+/* Navbar login/logout button - small & responsive */
+.user-menu button.btn-outline {
+  padding: 6px 10px;       /* chhoto padding */
+  font-size: 13px;         /* font size chhoto */
+  gap: 4px;                /* icon-text gap chhoto */
+  max-width: 150px;        /* beshi bariye na jaowar limit */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Icon inside button */
+.user-menu button.btn-outline i {
+  font-size: 12px;
+}
+
+/* Dropdown text small */
+.user-dropdown .dropdown-item span {
+  font-size: 13px;
+}
+
+/* Mobile / tablet */
+@media (max-width:1024px){
+  .user-menu button.btn-outline {
+    padding: 5px 8px;
+    font-size: 12px;
+    gap: 3px;
+    max-width: 130px;
+  }
+  .user-dropdown .dropdown-item span {
+    font-size: 12px;
+  }
+  .user-menu button.btn-outline i {
+    font-size: 11px;
+  }
+}
+
+@media (max-width:768px){
+  .user-menu button.btn-outline {
+    padding: 4px 6px;
+    font-size: 11px;
+    gap: 2px;
+    max-width: 120px;
+  }
+  .user-dropdown .dropdown-item span {
+    font-size: 11px;
+  }
+  .user-menu button.btn-outline i {
+    font-size: 10px;
+  }
+}
+@media (max-width:480px){
+  .user-dropdown {
+    width: 90%; /* Fit small screens */
+  }
+
+  .user-menu button {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+}
+/* Make user menu button and dropdown responsive */
+@media (max-width:768px) {
+  .user-menu {
+    width: 100%;
+  }
+  #userMenuButton {
+    font-size: 14px;        /* smaller text */
+    padding: 8px 12px;      /* less padding */
+    gap: px;               /* reduce icon spacing */
+  }
+  #userMenuButton i {
+    font-size: 14px;        /* smaller icons */
+  }
+  .user-dropdown {
+    width: 100%;            /* fit the screen */
+    right: 0;
+    left: 0;
+    padding: 8px 0;
+  }
+  .dropdown-item {
+    font-size: 14px;        /* smaller dropdown text */
+    padding: 8px 12px;
+  }
+}
+@media (max-width:576px) {
+  #userMenuButton {
+    font-size: 12px;
+    padding: 6px 10px;
+    gap: 2px;
+  }
+  .user-dropdown {
+    font-size: 12px;
+    padding: 4px 0;
+  }
+  .dropdown-item {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+}
+.thumb {
+  width: 100%;
+  height: 250px;       /* fixed height for all images */
+  object-fit: cover;   /* cover the container without distortion */
+  object-position: center;
+  background:#eef2f7;
+  border-radius:8px 8px 0 0;
+}
+.grid article.card, .grid article.card-large {
+  max-width: 100%;      /* ensure no card exceeds container */
+  overflow: hidden;
+}
+
+.card-large .thumb {
+  height: 350px;        /* taller for large card */
+}
+.excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* limit to 3 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+@media (max-width:768px) {
+  .thumb {
+    height: 200px;  /* smaller images on mobile */
+  }
+  .card-large .thumb {
+    height: 250px;
+  }
+}
+/* Logo Responsive */
+.logo {
+  max-width: 160px;   /* বড় স্ক্রিনে লোগোর সর্বোচ্চ প্রস্থ */
+  width: 100%;        /* parent অনুযায়ী resize হবে */
+  height: auto;       /* ছবির অনুপাত ঠিক থাকবে */
+  display: block;
+}
+
+/* Tablet এ logo ছোট হবে */
+@media (max-width: 992px) {
+  .logo {
+    max-width: 130px;
+  }
+}
+
+/* Mobile এ logo আরও ছোট হবে */
+@media (max-width: 576px) {
+  .logo {
+    max-width: 110px;
+  }
+}
+/* Breaking News Section */
+/* Navbar এর নিচে fixed marquee */
+.breaking-news {
+  position: fixed;          /* fixed position */
+  top: 67px;                /* navbar height অনুযায়ী adjust করুন */
+  left: 0;
+  width: 100%;
+  z-index: 10;            /* navbar এর নিচে দেখানোর জন্য */
+  display: flex;
+  align-items: center;
+  background: var(--brand, #d32f2f);
+  color: #fff;
+  font-family: 'Noto Sans Bengali', sans-serif;
+  padding: 8px 0;
+  border-bottom: 3px solid #b71c1c;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.breaking-news .container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.breaking-news-label {
+  font-weight: 700;
+  background: #b71c1c;
+  padding: 5px 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.breaking-news-content {
+  flex: 1;
+  overflow: hidden;
+  font-size: 15px;
+}
+
+.breaking-news-content marquee {
+  font-weight: 500;
+  color: #fff;
+}
+
+/* Navbar + Marquee এ scroll হলে content নিচে যায় */
+.hide{
+  display:none;
+}
+.trending-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+  transition: all 0.3s;
+}
+
+.trending-list li:hover {
+  background-color: #f9f9f9;
+  transform: translateX(5px);
+}
+
+.trending-list li a {
+  display: block;
+  color: #333;
+  text-decoration: none;
+}
+
+.trending-list li strong {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.view-count {
+  background: #e53935;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+/* Mobile only class */
+.mobile-only {
+  display: none;
+}
+
+@media (max-width:768px) {
+  .mobile-only {
+    display: block;
+    margin-bottom: 20px;
+  }
+}
+.desktop-only { display: block; }
+.mobile-only { display: none; }
+
+@media (max-width:768px){
+  .desktop-only { display: none; }
+  .mobile-only { display: block; }
+}
+/* Popular posts list */
+#popularPostsMobile li {
+  margin-bottom: 10px;
+}
+
+/* Post link style */
+#popularPostsMobile li a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #000;
+  padding: 5px;
+  transition: background 0.2s ease;
+}
+
+#popularPostsMobile li a:hover {
+  background: #f5f5f5;
+  border-radius: 5px;
+}
+
+/* Thumbnail image */
+#popularPostsMobile li img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  margin-right: 10px;
+  border-radius: 4px;
+}
+
+/* More button styles */
+.more-btn {
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.more-btn:hover {
+  background-color: #d32f2f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.more-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+/* Live Section */
+#liveNewsSection {
+  display: none;
+  margin-bottom: 30px;
+}
+
+#liveNewsSection h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* Live red dot */
+.live-dot {
+  width: 12px;
+  height: 12px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Live Card */
+.live-card {
+  margin-bottom: 15px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.live-card img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover; /* important: prevents image from stretching */
+  border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #liveNewsSection h2 {
+    font-size: 1.2rem;
+  }
+
+  .live-card img {
+    max-height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  #liveNewsSection h2 {
+    font-size: 1rem;
+  }
+
+  .live-card img {
+    max-height: 120px;
+  }
+}
+/* Live Section Header */
+.live-header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* Red Live Dot */
+.live-dot {
+  width: 12px;
+  height: 12px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 1.2s infinite;
+  padding-left:2px
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <button class="nav-toggle" id="navToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        
+        <a href="index.html" class="brand"><img src="logo.png" style="width:100px" class="logo"></a>
+        
+        <nav class="nav" id="mainNav">
+          <a href="index.html" class="nav-link">হোম</a>
+          <a href="post_list.html" class="nav-link active">পোস্ট ম্যানেজমেন্ট</a>
+          <a href="national.html" class="nav-link">জাতীয়</a>
+          <a href="politics.html" class="nav-link">রাজনীতি</a>
+        </nav>
+        
+        <div class="header-actions">
+          <!-- User menu -->
+          <div class="user-menu" id="userMenu">
+            <button class="btn btn-outline" id="userMenuButton">
+              <i class="fas fa-user"></i> 
+              <span id="userMenuText">লগইন</span>
+              <i class="fas fa-chevron-down" style="font-size:12px"></i>
+            </button>
+            
+            <div class="user-dropdown" id="userDropdown">
+              <div class="dropdown-item" id="loginMenuItem">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>লগইন</span>
+              </div>
+              <div class="dropdown-item hidden" id="adminMenuItem">
+                <i class="fas fa-cog"></i>
+                <span>অ্যাডমিন প্যানেল</span>
+              </div>
+              <div class="dropdown-item hidden" id="logoutMenuItem">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>লগআউট</span>
+              </div>
+              <div class="dropdown-divider hidden" id="dropdownDivider"></div>
+              <div class="dropdown-item">
+                <i class="fas fa-user-circle"></i>
+                <span id="userEmail"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container" style="margin-top: 30px;">
+    <h2 class="section-title">পোস্ট ম্যানেজমেন্ট</h2>
+    
+    <!-- Stats Cards -->
+    <div class="stats-cards">
+      <div class="stat-card">
+        <div class="stat-number" id="totalPosts">0</div>
+        <div class="stat-label">মোট পোস্ট</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="publishedPosts">0</div>
+        <div class="stat-label">প্রকাশিত</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="draftPosts">0</div>
+        <div class="stat-label">খসড়া</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="todayPosts">0</div>
+        <div class="stat-label">আজকের পোস্ট</div>
+      </div>
+    </div>
+    
+    <!-- Search and Filter -->
+    <div class="search-filter">
+      <div class="form-group" style="flex-grow: 1;">
+        <input type="text" class="form-input" id="searchInput" placeholder="পোস্ট খুঁজুন...">
+      </div>
+      
+      <div class="form-group">
+        <select class="form-select" id="categoryFilter">
+          <option value="">সব ক্যাটেগরি</option>
+          <option value="national">জাতীয়</option>
+          <option value="politics">রাজনীতি</option>
+          <option value="international">আন্তর্জাতিক</option>
+          <option value="sports">খেলা</option>
+          <option value="entertainment">বিনোদন</option>
+          <option value="technology">প্রযুক্তি</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <select class="form-select" id="statusFilter">
+          <option value="">সব স্ট্যাটাস</option>
+          <option value="published">প্রকাশিত</option>
+          <option value="draft">খসড়া</option>
+        </select>
+      </div>
+      
+      <button class="btn btn-primary" id="applyFilters">
+        <i class="fas fa-filter"></i> ফিল্টার প্রয়োগ করুন
+      </button>
+    </div>
+    
+    <!-- Posts Table -->
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table" id="postsTable">
+            <thead>
+              <tr>
+                <th>শিরোনাম</th>
+                <th>ক্যাটেগরি</th>
+                <th>তারিখ</th>
+                <th>স্ট্যাটাস</th>
+                <th>ভিউ</th>
+                <th>একশন</th>
+              </tr>
+            </thead>
+            <tbody id="postsTableBody">
+              <!-- Posts will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+          <!-- Pagination will be generated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal" id="deleteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">পোস্ট ডিলিট করুন</h3>
+        <button class="modal-close" id="closeDeleteModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <p>আপনি কি নিশ্চিত যে আপনি "<span id="deletePostTitle"></span>" পোস্টটি ডিলিট করতে চান?</p>
+        <p class="text-error">এই কাজটি undo করা যাবে না।</p>
+        
+        <div class="form-actions" style="margin-top: 20px;">
+          <button type="button" class="btn btn-outline" id="cancelDelete">
+            বাতিল করুন
+          </button>
+          <button type="button" class="btn btn-danger" id="confirmDelete">
+            <i class="fas fa-trash"></i> ডিলিট করুন
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  
+  <!-- Firebase and App Scripts -->
+  <script src="firebase-config.js"></script>
+  <script>
+    // DOM Elements
+    const postsTableBody = document.getElementById('postsTableBody');
+    const deleteModal = document.getElementById('deleteModal');
+    const closeDeleteModal = document.getElementById('closeDeleteModal');
+    const cancelDelete = document.getElementById('cancelDelete');
+    const confirmDelete = document.getElementById('confirmDelete');
+    const deletePostTitle = document.getElementById('deletePostTitle');
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const applyFilters = document.getElementById('applyFilters');
+    const pagination = document.getElementById('pagination');
+    const totalPosts = document.getElementById('totalPosts');
+    const publishedPosts = document.getElementById('publishedPosts');
+    const draftPosts = document.getElementById('draftPosts');
+    const todayPosts = document.getElementById('todayPosts');
+    
+    // Variables
+    let allPosts = [];
+    let filteredPosts = [];
+    let currentPage = 1;
+    const postsPerPage = 10;
+    let postToDelete = null;
+    
+    // Format date to Bengali
+    function formatBengaliDate(timestamp) {
+      const date = timestamp.toDate();
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return date.toLocaleDateString('bn-BD', options);
+    }
+    
+    // Load all posts
+    async function loadAllPosts() {
+      try {
+        const querySnapshot = await db.collection('news')
+          .orderBy('createdAt', 'desc')
+          .get();
+        
+        allPosts = [];
+        querySnapshot.forEach((doc) => {
+          allPosts.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+        
+        applyFiltering();
+        updateStats();
+      } catch (error) {
+        console.error('Error loading posts:', error);
+        postsTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center">
+              <p>পোস্ট লোড করতে সমস্যা হচ্ছে। পরে আবার চেষ্টা করুন।</p>
+            </td>
+          </tr>
+        `;
+      }
+    }
+    
+    // Apply filtering based on search and filters
+    function applyFiltering() {
+      const searchText = searchInput.value.toLowerCase();
+      const category = categoryFilter.value;
+      const status = statusFilter.value;
+      
+      filteredPosts = allPosts.filter(post => {
+        // Search filter
+        const matchesSearch = !searchText || 
+          post.title.toLowerCase().includes(searchText) || 
+          post.excerpt.toLowerCase().includes(searchText);
+        
+        // Category filter
+        const matchesCategory = !category || post.category === category;
+        
+        // Status filter (assuming a status field, default to published if not exists)
+        const postStatus = post.status || 'published';
+        const matchesStatus = !status || postStatus === status;
+        
+        return matchesSearch && matchesCategory && matchesStatus;
+      });
+      
+      currentPage = 1;
+      renderPosts();
+      renderPagination();
+    }
+    
+    // Update statistics
+    function updateStats() {
+      totalPosts.textContent = allPosts.length;
+      
+      const publishedCount = allPosts.filter(post => (post.status || 'published') === 'published').length;
+      publishedPosts.textContent = publishedCount;
+      
+      const draftCount = allPosts.filter(post => post.status === 'draft').length;
+      draftPosts.textContent = draftCount;
+      
+      // Today's posts
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const todayCount = allPosts.filter(post => {
+        const postDate = post.createdAt.toDate();
+        postDate.setHours(0, 0, 0, 0);
+        return postDate.getTime() === today.getTime();
+      }).length;
+      
+      todayPosts.textContent = todayCount;
+    }
+    
+    // Render posts for current page
+    function renderPosts() {
+      const startIndex = (currentPage - 1) * postsPerPage;
+      const endIndex = startIndex + postsPerPage;
+      const postsToShow = filteredPosts.slice(startIndex, endIndex);
+      
+      if (postsToShow.length === 0) {
+        postsTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center">
+              <p>কোনো পোস্ট পাওয়া যায়নি।</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      postsTableBody.innerHTML = '';
+      
+      postsToShow.forEach(post => {
+        const status = post.status || 'published';
+        const statusText = status === 'published' ? 'প্রকাশিত' : 'খসড়া';
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>
+            <strong>${post.title}</strong>
+            <p class="text-muted" style="margin:5px 0 0;font-size:14px">${post.excerpt.substring(0, 60)}...</p>
+          </td>
+          <td>${post.category}</td>
+          <td>${formatBengaliDate(post.createdAt)}</td>
+          <td>
+            <span class="post-status ${status === 'published' ? 'status-published' : 'status-draft'}">
+              ${statusText}
+            </span>
+          </td>
+          <td>${post.views || 0}</td>
+          <td>
+            <div class="admin-actions">
+              <a href="open.html?postId=${post.id}" class="btn btn-sm btn-outline" target="_blank">
+                <i class="fas fa-eye"></i>
+              </a>
+              <button class="btn btn-sm btn-primary edit-post" data-id="${post.id}">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger delete-post" data-id="${post.id}" data-title="${post.title}">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        
+        postsTableBody.appendChild(row);
+      });
+      
+      // Add event listeners to action buttons
+      document.querySelectorAll('.edit-post').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const postId = e.target.closest('.edit-post').dataset.id;
+          editPost(postId);
+        });
+      });
+      
+      document.querySelectorAll('.delete-post').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const postId = e.target.closest('.delete-post').dataset.id;
+          const postTitle = e.target.closest('.delete-post').dataset.title;
+          showDeleteModal(postId, postTitle);
+        });
+      });
+    }
+    
+    // Render pagination
+    function renderPagination() {
+      const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+      
+      if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+      }
+      
+      let paginationHTML = '';
+      
+      // Previous button
+      if (currentPage > 1) {
+        paginationHTML += `<button class="page-btn" data-page="${currentPage - 1}"><i class="fas fa-chevron-left"></i></button>`;
+      }
+      
+      // Page numbers
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, startPage + 4);
+      
+      for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+      }
+      
+      // Next button
+      if (currentPage < totalPages) {
+        paginationHTML += `<button class="page-btn" data-page="${currentPage + 1}"><i class="fas fa-chevron-right"></i></button>`;
+      }
+      
+      pagination.innerHTML = paginationHTML;
+      
+      // Add event listeners to pagination buttons
+      pagination.querySelectorAll('.page-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          currentPage = parseInt(e.target.dataset.page);
+          renderPosts();
+          renderPagination();
+          window.scrollTo(0, 0);
+        });
+      });
+    }
+    
+    // Edit post - redirect to post edit page or open in admin drawer
+    function editPost(postId) {
+      // You can implement this based on your setup
+      // For example, open the admin drawer with the post data
+      window.location.href = `post.html?edit=${postId}`;
+    }
+    
+    // Show delete confirmation modal
+    function showDeleteModal(postId, title) {
+      postToDelete = postId;
+      deletePostTitle.textContent = title;
+      deleteModal.classList.add('open');
+    }
+    
+    // Delete post
+    async function deletePost() {
+      if (!postToDelete) return;
+      
+      try {
+        // Delete from Firestore
+        await db.collection('news').doc(postToDelete).delete();
+        
+        // If the post has an image, delete it from storage too
+        const post = allPosts.find(p => p.id === postToDelete);
+        if (post && post.imageUrl && post.imageUrl.includes('firebasestorage.googleapis.com')) {
+          try {
+            const imageRef = storage.refFromURL(post.imageUrl);
+            await imageRef.delete();
+          } catch (error) {
+            console.error('Error deleting image:', error);
+            // Continue even if image deletion fails
+          }
+        }
+        
+        // Show success message
+        alert('পোস্ট সফলভাবে ডিলিট করা হয়েছে।');
+        
+        // Close modal and reload posts
+        deleteModal.classList.remove('open');
+        loadAllPosts();
+        
+      } catch (error) {
+        console.error('Error deleting post:', error);
+        alert('পোস্ট ডিলিট করতে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।');
+      }
+    }
+    
+    // Event Listeners
+    closeDeleteModal.addEventListener('click', () => {
+      deleteModal.classList.remove('open');
+    });
+    
+    cancelDelete.addEventListener('click', () => {
+      deleteModal.classList.remove('open');
+    });
+    
+    confirmDelete.addEventListener('click', deletePost);
+    
+    searchInput.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') {
+        applyFiltering();
+      }
+    });
+    
+    applyFilters.addEventListener('click', applyFiltering);
+    
+    // Auth state observer
+    auth.onAuthStateChanged((user) => {
+      updateUI(user);
+      
+      if (user) {
+        // User is signed in, load posts
+        loadAllPosts();
+      } else {
+        // User is not signed in, redirect to login
+        window.location.href = 'index.html';
+      }
+    });
+    
+    // Update UI based on authentication state (reuse from your existing code)
+    function updateUI(user) {
+      if (user) {
+        // User is signed in
+        userMenuText.textContent = 'লগআউট';
+        loginMenuItem.classList.add('hidden');
+        logoutMenuItem.classList.remove('hidden');
+        dropdownDivider.classList.add('hidden');
+        adminMenuItem.classList.remove('hidden');
+      } else {
+        // User is signed out
+        userMenuText.textContent = 'লগইন';
+        loginMenuItem.classList.remove('hidden');
+        logoutMenuItem.classList.add('hidden');
+        dropdownDivider.classList.add('hidden');
+        adminMenuItem.classList.add('hidden');
+      }
+    }
+    
+    // Logout functionality (reuse from your existing code)
+    logoutMenuItem.addEventListener('click', () => {
+      auth.signOut().then(() => {
+        userMenu.classList.remove('open');
+        console.log('User signed out');
+      }).catch((error) => {
+        console.error('Sign out error:', error);
+      });
+    });
+  </script>
+</body>
+</html
