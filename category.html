@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ক্যাটেগরি ম্যানেজমেন্ট</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <header class="bg-teal-700 text-white p-4 shadow-md">
+    <h1 class="text-xl sm:text-2xl font-bold text-center">ক্যাটেগরি ম্যানেজমেন্ট</h1>
+  </header>
+
+  <main class="flex-1 container mx-auto p-4">
+    <!-- Add Category Form -->
+    <div class="bg-white p-4 rounded-lg shadow mb-6 flex flex-col sm:flex-row gap-2 sm:items-center">
+      <input type="text" id="categoryName" placeholder="ক্যাটেগরি নাম লিখুন" class="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500">
+      <input type="text" id="categorySlug" placeholder="Slug লিখুন (optional)" class="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500">
+      <button id="addCategoryBtn" class="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition-colors">
+        <i class="fas fa-plus mr-2"></i> যোগ করুন
+      </button>
+    </div>
+
+    <!-- Message -->
+    <div id="message" class="hidden p-3 rounded text-white mb-4"></div>
+
+    <!-- Categories Table -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white rounded-lg shadow overflow-hidden">
+        <thead class="bg-teal-600 text-white">
+          <tr>
+            <th class="py-2 px-3 text-left">#</th>
+            <th class="py-2 px-3 text-left">নাম</th>
+            <th class="py-2 px-3 text-left">Slug</th>
+            <th class="py-2 px-3 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="categoryTableBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="bg-gray-200 text-gray-700 p-4 text-center">
+    &copy; 2025 তোমার সাইট. সকল অধিকার সংরক্ষিত।
+  </footer>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <script>
+    // Firebase Config
+   const firebaseConfig = {
+  apiKey: "AIzaSyCP6zCBnpY2IgIEPAtiAzuF6_83F4vU-xs",
+  authDomain: "vip-news-aa9d1.firebaseapp.com",
+  projectId: "vip-news-aa9d1",
+  storageBucket: "vip-news-aa9d1.firebasestorage.app",
+  messagingSenderId: "105863450293",
+  appId: "1:105863450293:web:27d4c874ec3fef0184f8fc",
+  measurementId: "G-TDRFDHC7ER"
+};
+
+// Initialize Firebase
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const categoryNameInput = document.getElementById('categoryName');
+    const categorySlugInput = document.getElementById('categorySlug');
+    const addCategoryBtn = document.getElementById('addCategoryBtn');
+    const messageDiv = document.getElementById('message');
+    const categoryTableBody = document.getElementById('categoryTableBody');
+
+    function showMessage(text, type='success') {
+      messageDiv.textContent = text;
+      messageDiv.className = `p-3 rounded mb-4 text-white ${type==='success' ? 'bg-green-500' : 'bg-red-500'} block`;
+      setTimeout(() => messageDiv.classList.add('hidden'), 3000);
+    }
+
+    // Add category
+    addCategoryBtn.addEventListener('click', () => {
+      const name = categoryNameInput.value.trim();
+      const slug = categorySlugInput.value.trim() || name.toLowerCase().replace(/\s+/g,'-');
+      if (!name) return showMessage('ক্যাটেগরি নাম লিখুন!', 'error');
+
+      const newRef = db.ref('categories').push();
+      newRef.set({ name, slug })
+        .then(() => {
+          showMessage('ক্যাটেগরি সফলভাবে যোগ হয়েছে!');
+          categoryNameInput.value = '';
+          categorySlugInput.value = '';
+        })
+        .catch(err => showMessage('ত্রুটি: ' + err.message, 'error'));
+    });
+
+    function renderCategories(categories) {
+      categoryTableBody.innerHTML = '';
+      if (!categories) return;
+      let i = 1;
+      Object.keys(categories).forEach(key => {
+        const cat = categories[key];
+        const tr = document.createElement('tr');
+        tr.className = 'border-b hover:bg-gray-50 transition-colors';
+        tr.innerHTML = `
+          <td class="py-2 px-3">${i}</td>
+          <td class="py-2 px-3"><input type="text" value="${cat.name}" data-key="${key}" class="border border-gray-300 rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-teal-500 edit-name"></td>
+          <td class="py-2 px-3"><input type="text" value="${cat.slug}" data-key="${key}" class="border border-gray-300 rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-teal-500 edit-slug"></td>
+          <td class="py-2 px-3 flex gap-2">
+            <button class="btn-edit bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600" data-key="${key}"><i class="fas fa-edit"></i> Update</button>
+            <button class="btn-delete bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700" data-key="${key}"><i class="fas fa-trash"></i> Delete</button>
+          </td>
+        `;
+        categoryTableBody.appendChild(tr);
+        i++;
+      });
+
+      // Update
+      document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.dataset.key;
+          const newName = document.querySelector(`.edit-name[data-key="${key}"]`).value.trim();
+          const newSlug = document.querySelector(`.edit-slug[data-key="${key}"]`).value.trim();
+          if (!newName) return showMessage('নাম খালি হতে পারবে না!', 'error');
+          db.ref('categories/' + key).update({ name: newName, slug: newSlug })
+            .then(() => showMessage('ক্যাটেগরি আপডেট হয়েছে!'))
+            .catch(err => showMessage('ত্রুটি: ' + err.message, 'error'));
+        });
+      });
+
+      // Delete
+      document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.dataset.key;
+          if (confirm('আপনি কি এই ক্যাটেগরি মুছে দিতে চান?')) {
+            db.ref('categories/' + key).remove()
+              .then(() => showMessage('ক্যাটেগরি মুছে দেওয়া হয়েছে!'))
+              .catch(err => showMessage('ত্রুটি: ' + err.message, 'error'));
+          }
+        });
+      });
+    }
+
+    // Listen realtime
+    db.ref('categories').on('value', snapshot => {
+      renderCategories(snapshot.val());
+    });
+  </script>
+</body>
+</html>

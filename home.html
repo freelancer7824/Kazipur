@@ -1,0 +1,362 @@
+ <!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- Open Graph Meta Tags -->
+<meta property="og:title" content="কাজিপুর এক্সপ্রেস — পত্রিকা | সর্বশেষ | জাতীয় | রাজনীতি" />
+<meta property="og:description" content="বাংলাদেশ এবং সারা বিশ্বের সর্বশেষ খবর, ভিডিও এবং বিশেষ প্রতিবেদন পড়ুন আমাদের ওয়েবসাইটে।" />
+<meta property="og:image" content="https://yourdomain.com/logo.png" />
+<meta property="og:url" content="https://yourdomain.com/" />
+<meta property="og:type" content="website" />
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="পত্রিকা" />
+<meta name="twitter:description" content="বাংলাদেশ এবং সারা বিশ্বের সর্বশেষ খবর পড়ুন আমাদের ওয়েবসাইটে।" />
+<meta name="twitter:image" content="https://rdxceo.free.nf/news/logo.png" />
+  
+  <title>কাজিপুর এক্সপ্রেস — পত্রিকা | সর্বশেষ | জাতীয় | রাজনীতি</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+  <!-- Header -->
+  <header class="header" style="display: none;">
+    <div class="container">
+      <div class="header-inner">
+        <button class="nav-toggle" id="navToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        
+        <a href="index.html" class="brand"><img src="logo.png" style="width:100px" class="logo"></a>
+        
+        <nav class="nav" id="mainNav">
+          <a href="index.html" class="nav-link active">হোম</a>
+          <a href="national.html" class="nav-link">জাতীয়</a>
+          <a href="politics.html" class="nav-link">রাজনীতি</a>
+          <a href="international.html" class="nav-link">আন্তর্জাতিক</a>
+          <a href="sports.html" class="nav-link">খেলা</a>
+          <a href="entertainment.html" class="nav-link">বিনোদন</a>
+          <a href="technology.html" class="nav-link">প্রযুক্তি</a>
+        </nav>
+        
+        <div class="header-actions">
+          <form class="search-form">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="খুঁজুন...">
+          </form>
+          
+          <!-- User menu - will be toggled based on auth state -->
+          <div class="user-menu" id="userMenu">
+            <button class="btn btn-outline" id="userMenuButton">
+              <i class="fas fa-user"></i> 
+              <span id="userMenuText">লগইন</span>
+              <i class="fas fa-chevron-down" style="font-size:12px"></i>
+            </button>
+            
+            <div class="user-dropdown" id="userDropdown">
+              <div class="dropdown-item" id="loginMenuItem">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>লগইন</span>
+              </div>
+              <div class="dropdown-item hidden" id="adminMenuItem">
+                <i class="fas fa-cog"></i>
+                <span>অ্যাডমিন প্যানেল</span>
+              </div>
+              <div class="dropdown-item hidden" id="logoutMenuItem">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>লগআউট</span>
+              </div>
+              <div class="dropdown-divider hidden" id="dropdownDivider"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+<!----breaking News Section--->
+<!-- Breaking News Marquee -->
+<!-- Breaking News Marquee -->
+<!-- Breaking News Marquee -->
+<div class="head">
+<section class="breaking-news" id="breakingNewsSection">
+  <div class="container">
+    <div class="breaking-news-label">
+      <i class="fas fa-bolt"></i> ব্রেকিং নিউজ
+    </div>
+    <div class="breaking-news-content" id="breakingNewsWrapper">
+      <marquee behavior="scroll" direction="left" scrollamount="5" onmouseover="this.stop();" onmouseout="this.start();">
+        
+      </marquee>
+    </div>
+  </div>
+</section>
+</div>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">সর্বশেষ খবর পড়ুন এখনই</h1>
+        <p class="hero-desc">বাংলাদেশ এবং সারা বিশ্বের সর্বশেষ খবর, ভিডিও এবং বিশেষ প্রতিবেদন পড়ুন আমাদের ওয়েবসাইটে</p>
+        <a href="#latest-news" class="btn btn-primary">
+          <i class="fas fa-arrow-down"></i> আরও পড়ুন
+        </a>
+      </div>
+    </div>
+  </section>
+<!-- Live News Section -->
+<div id="liveNewsSection" style="display:none;">
+  <h2 class="live-header">
+    <span class="live-dot"></span>
+    <strong>Live News</strong>
+  </h2>
+  <div id="liveNewsWrapper"></div>
+</div>
+  <!-- Main Content -->
+  
+  
+  <!-- Mobile Popular Posts -->
+<div class="sidebar-widget mobile-only" id="mobilePopularPosts">
+  <h3 class="widget-title">সর্বশেষ আপডেট</h3>
+  <ul class="trending-list" id="popularPostsMobile">
+    <!-- JS থেকে একই data লোড হবে -->
+  </ul>
+</div>
+  
+  <section id="categorySection">
+  <h2>খবর ক্যাটাগরি অনুসারে</h2>
+  
+  <!-- Horizontal scrollable category buttons -->
+  <div id="categoryScroll" class="category-scroll"></div>
+  
+  <!-- More button -->
+  <button id="moreCategories" class="more-btn">More</button>
+  
+  <!-- Full vertical category list (hidden initially) -->
+  <div id="allCategoryList" class="all-category-list hidden"></div>
+  
+  <!-- Filtered news -->
+  <div id="categoryPosts"></div>
+</section>
+  
+  <div class="container">
+    <div class="content-wrapper">
+      <main class="main-content">
+        <h2 class="section-title" id="latest-news">নিউজ পেপার </h2>
+        
+        <div class="grid" id="newsFeed">
+          <!-- News cards will be loaded here -->
+        </div>
+      </main>
+      
+      <aside class="sidebar">
+        <div class="sidebar-widget">
+  <h3 class="widget-title">জনপ্রিয় খবর</h3>
+  <ul class="trending-list" id="popularPosts">
+    <!-- জনপ্রিয় খবরগুলো এখানে লোড হবে -->
+  </ul>
+</div>
+        
+        <div class="sidebar-widget">
+          <h3 class="widget-title">ক্যাটেগরিস</h3>
+          <ul class="footer-links">
+            <li class="footer-link"><a href="national.html">জাতীয়</a></li>
+            <li class="footer-link"><a href="politics.html">রাজনীতি</a></li>
+            <li class="footer-link"><a href="international.html">আন্তর্জাতিক</a></li>
+            <li class="footer-link"><a href="sports.html">খেলা</a></li>
+            <li class="footer-link"><a href="entertainment.html">বিনোদন</a></li>
+            <li class="footer-link"><a href="technology.html">প্রযুক্তি</a></li>
+          </ul>
+        </div>
+        
+        <div class="sidebar-widget">
+          <h3 class="widget-title">নিউজলেটার সাবস্ক্রাইব</h3>
+          <form id="newsletterForm">
+            <div class="form-group">
+              <input type="email" class="form-input" placeholder="আপনার ইমেইল" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%">
+              <i class="fas fa-paper-plane"></i> সাবস্ক্রাইব
+            </button>
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h3 class="footer-brand">কাজিপুর এক্সপ্রেস</h3>
+          <p class="footer-desc">বাংলাদেশের অন্যতম প্রধান অনলাইন নিউজ পোর্টাল। আমরা বিশ্বস্ত এবং নির্ভরযোগ্য খবর পরিবেশন করি।</p>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="footer-title">ক্যাটেগরিস</h3>
+          <ul class="footer-links">
+            <li class="footer-link"><a href="national.html">জাতীয়</a></li>
+            <li class="footer-link"><a href="politics.html">রাজনীতি</a></li>
+            <li class="footer-link"><a href="international.html">আন্তর্জাতিক</a></li>
+            <li class="footer-link"><a href="sports.html">খেলা</a></li>
+            <li class="footer-link"><a href="entertainment.html">বিনোদন</a></li>
+            <li class="footer-link"><a href="technology.html">প্রযুক্তি</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="footer-title">দরকারি লিংক</h3>
+          <ul class="footer-links">
+            <li class="footer-link"><a href="about.html">আমাদের সম্পর্কে</a></li>
+            <li class="footer-link"><a href="contact.html">যোগাযোগ</a></li>
+            <li class="footer-link"><a href="privacy.html">গোপনীয়তা নীতি</a></li>
+            <li class="footer-link"><a href="terms.html">সেবার শর্তাবলী</a></li>
+            <li class="footer-link"><a href="advertise.html">বিজ্ঞাপন দিন</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="footer-title">যোগাযোগ</h3>
+          <ul class="footer-links">
+            <li class="footer-link"><i class="fas fa-map-marker-alt"></i> কাজীপুর সদর, কাজীপুর, সিরাজগঞ্জ</li>
+            <li class="footer-link"><i class="fas fa-phone"></i> বার্তা বিভাগঃ ০১৭৯৩৯২২১৪৯</li>
+            <li class="footer-link"><i class="fas fa-envelope"></i> ই-মেইলঃ ashraful49alam@gmail.com</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="copyright">
+        &copy; কাজিপুর এক্সপ্রেস - সকল حقوق محفوظة
+      </div>
+    </div>
+  </footer>
+
+  <!-- Admin Panel -->
+  <div class="admin-panel">
+    <button class="admin-fab" id="adminFab">
+      <i class="fas fa-plus"></i>
+    </button>
+    
+    <div class="admin-drawer" id="adminDrawer">
+      <div class="admin-header">
+        <h3 class="admin-title">পোস্ট তৈরি করুন</h3>
+        <button class="admin-close" id="adminClose">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="admin-body">
+        <form id="postForm">
+          <div class="form-group">
+            <label class="form-label">শিরোনাম</label>
+            <input type="text" class="form-input" id="postTitle" placeholder="শিরোনাম" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">ক্যাটেগরি</label>
+            <select class="form-select" id="postCategory" required>
+              <option value="">ক্যাটেগরি নির্বাচন করুন</option>
+              <option value="national">জাতীয়</option>
+              <option value="politics">রাজনীতি</option>
+              <option value="international">আন্তর্জাতিক</option>
+              <option value="sports">খেলা</option>
+              <option value="entertainment">বিনোদন</option>
+              <option value="technology">প্রযুক্তি</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">ছবি</label>
+            <input type="file" id="postImage" accept="image/*" class="form-input">
+            <div id="imagePreview" class="hidden" style="margin-top:10px;max-width:100%;border-radius:8px;overflow:hidden"></div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">সারাংশ</label>
+            <textarea class="form-textarea" id="postExcerpt" placeholder="সারাংশ" required></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">সূত্র</label>
+              <input type="text" class="form-input" id="postSource" placeholder="সূত্র">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">লেখক</label>
+              <input type="text" class="form-input" id="postAuthor" placeholder="লেখক">
+            </div>
+          </div>
+          
+          <div id="formMessage" class="form-message hidden"></div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="loginAdmin">
+              <i class="fas fa-sign-in-alt"></i> অ্যাডমিন লগইন
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-paper-plane"></i> পোস্ট করুন
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">অ্যাডমিন লগইন</h3>
+        <button class="modal-close" id="closeLoginModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="loginForm">
+          <div class="form-group">
+            <label class="form-label">ইমেইল</label>
+            <input type="email" class="form-input" id="loginEmail" placeholder="আপনার ইমেইল" required value="">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">পাসওয়ার্ড</label>
+            <input type="password" class="form-input" id="loginPassword" placeholder="আপনার পাসওয়ার্ড" required value="">
+          </div>
+          
+          <div id="loginMessage" class="form-message hidden"></div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" style="width:100%">
+              <i class="fas fa-sign-in-alt"></i> লগইন
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  
+  <!-- Firebase and App Scripts -->
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Section Admin Panel</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  body { font-family: 'Noto Sans Bengali', sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+  h1 { text-align: center; margin-bottom: 20px; }
+  #liveNewsSection { display: none; margin-bottom: 30px; }
+  .live-card { margin-bottom: 15px; }
+  .live-card img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 5px; }
+  form { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
+  form input[type="file"], form input[type="text"] { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+  form button { padding: 10px 20px; border: none; background: #e53935; color: white; border-radius: 5px; cursor: pointer; }
+  form button:hover { background: #d32f2f; }
+  #liveMessage { margin-top: 10px; font-weight: bold; }
+  .success { color: green; }
+  .error { color: red; }
+  .toggle-container { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; gap: 10px; }
+  .toggle-container label { font-weight: bold; }
+  .toggle-container input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+  .delete-btn {
+  margin-top: 5px;
+  padding: 5px 10px;
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.delete-btn:hover {
+  background: #d32f2f;
+}
+</style>
+</head>
+<body>
+
+<h1>Live Section Admin Panel</h1>
+
+<div class="toggle-container">
+  <label for="toggleLive">Live Section On/Off:</label>
+  <input type="checkbox" id="toggleLive">
+</div>
+
+<div id="liveNewsSection">
+  <h2>Current Live Banners</h2>
+  <div id="liveNewsWrapper"></div>
+</div>
+
+<form id="liveForm">
+  <h2>Add New Live Banner</h2>
+  <input type="file" id="liveImage" accept="image/*">
+  <input type="text" id="liveLink" placeholder="Enter link for live banner">
+  <button type="submit">Add Live Banner</button>
+  <div id="liveMessage"></div>
+</form>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // Your Firebase Config
+  const firebaseConfig = {
+  apiKey: "AIzaSyCP6zCBnpY2IgIEPAtiAzuF6_83F4vU-xs",
+  authDomain: "vip-news-aa9d1.firebaseapp.com",
+  projectId: "vip-news-aa9d1",
+  storageBucket: "vip-news-aa9d1.firebasestorage.app",
+  messagingSenderId: "105863450293",
+  appId: "1:105863450293:web:27d4c874ec3fef0184f8fc",
+  measurementId: "G-TDRFDHC7ER"
+};
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // Elements
+  const liveSection = document.getElementById("liveNewsSection");
+  const liveWrapper = document.getElementById("liveNewsWrapper");
+  const liveForm = document.getElementById("liveForm");
+  const liveImageInput = document.getElementById("liveImage");
+  const liveLinkInput = document.getElementById("liveLink");
+  const liveMessage = document.getElementById("liveMessage");
+  const toggleLive = document.getElementById("toggleLive");
+
+  // Fetch Live News
+  // Fetch Live News with Delete Option
+function fetchLiveNews() {
+  db.collection("liveNews")
+    .orderBy("created", "desc")
+    .onSnapshot(snapshot => {
+      liveWrapper.innerHTML = "";
+      let visible = false;
+      
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const id = doc.id;
+        
+        if (data.active) visible = true;
+        
+        // Live card with delete button
+        const card = document.createElement("div");
+        card.className = "live-card";
+        card.innerHTML = `
+          <a href="${data.link}" target="_blank">
+            <img src="${data.image}" alt="Live Banner">
+          </a>
+          <button class="delete-btn" data-id="${id}">Delete</button>
+        `;
+        liveWrapper.appendChild(card);
+      });
+      
+      liveSection.style.display = visible ? "block" : "none";
+      
+      // Delete button functionality
+      document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", async e => {
+          const id = e.target.dataset.id;
+          if (confirm("Are you sure you want to delete this live banner?")) {
+            try {
+              await db.collection("liveNews").doc(id).delete();
+              alert("Deleted successfully!");
+            } catch (err) {
+              console.error(err);
+              alert("Failed to delete!");
+            }
+          }
+        });
+      });
+      
+      // Set toggle state based on latest banner
+      if (snapshot.docs.length > 0) {
+        toggleLive.checked = snapshot.docs[0].data().active;
+      }
+    });
+}
+
+  // Admin: Add New Live Banner
+  liveForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    const file = liveImageInput.files[0];
+    const link = liveLinkInput.value.trim();
+
+    if (!file || !link) {
+      liveMessage.textContent = "ছবি এবং লিঙ্ক দিন।";
+      liveMessage.className = "error";
+      return;
+    }
+
+    try {
+      // Cloudinary Upload
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "Rosenews");
+      const res = await fetch("https://api.cloudinary.com/v1_1/dhvtgzy5x/image/upload", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+
+      // Save to Firestore
+      await db.collection("liveNews").add({
+        image: data.secure_url,
+        link: link,
+        active: true,
+        created: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      liveMessage.textContent = "Live banner সফলভাবে যোগ হয়েছে!";
+      liveMessage.className = "success";
+      liveForm.reset();
+
+    } catch (err) {
+      console.error(err);
+      liveMessage.textContent = "Upload ব্যর্থ হয়েছে।";
+      liveMessage.className = "error";
+    }
+  });
+
+  // Admin: Toggle Live Section
+  toggleLive.addEventListener("change", async () => {
+    const isOn = toggleLive.checked;
+    const snapshot = await db.collection("liveNews")
+      .orderBy("created", "desc")
+      .limit(1)
+      .get();
+
+    snapshot.forEach(async doc => {
+      await db.collection("liveNews").doc(doc.id).update({ active: isOn });
+    });
+  });
+
+  // Initial Load
+  fetchLiveNews();
+</script>
+
+</body>
+</html>
