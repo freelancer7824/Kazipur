@@ -56,7 +56,8 @@ adminClose.addEventListener('click', () => {
 
 // Open login modal from dropdown
 loginMenuItem.addEventListener('click', () => {
-  window.location.href="login.html"
+  loginModal.classList.add('open');
+  userMenu.classList.remove('open');
 });
 
 // Open admin panel from dropdown
@@ -244,7 +245,7 @@ async function loadNewsFeed() {
                 <span>${formatBengaliDate(news.createdAt)}</span>
               </div>
               <!-- Full post link added -->
-              <a href="open.html?postId=${postId}" class="btn btn-primary mt-2">পুরো পোস্ট দেখুন</a>
+              <button onclick="openNews('open.html?id=NEWS_ID')" class="btn btn-primary">পুরো খবর পড়ুন</button>
             </div>
           </article>
         `;
@@ -934,3 +935,49 @@ async function loadCategoryPosts(category) {
 }
 
 
+let lastScrollPos = 0; // স্ক্রল পজিশন ধরে রাখার জন্য ভেরিয়েবল
+
+// ১. নিউজ ওপেন করার ফাংশন
+function openNews(url) {
+  const popup = document.getElementById('newsPopup');
+  const iframe = document.getElementById('newsFrame');
+  
+  // বর্তমান স্ক্রল পজিশন সেভ করে রাখা
+  lastScrollPos = window.scrollY || document.documentElement.scrollTop;
+  
+  iframe.src = url;
+  popup.style.display = 'block';
+  
+  // মেইন পেজকে স্থির করে দেওয়া যাতে স্ক্রল না নড়ে
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${lastScrollPos}px`;
+  document.body.style.width = '100%';
+  
+  // হিস্টোরিতে স্টেট পুশ করা
+  history.pushState({ action: 'close-popup' }, '', window.location.href);
+}
+
+// ২. নিউজ বন্ধ করার ফাংশন
+function closeNews() {
+  const popup = document.getElementById('newsPopup');
+  const iframe = document.getElementById('newsFrame');
+  
+  popup.style.display = 'none';
+  iframe.src = '';
+  
+  // বডি রিলিজ করা এবং আগের পজিশনে ফিরিয়ে নেওয়া
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.width = '';
+  
+  // সরাসরি আগের জায়গায় জাম্প করানো
+  window.scrollTo(0, lastScrollPos);
+}
+
+// ৩. ব্যাক বাটন হ্যান্ডেল করা
+window.onpopstate = function(event) {
+  const popup = document.getElementById('newsPopup');
+  if (popup && popup.style.display === 'block') {
+    closeNews();
+  }
+};
