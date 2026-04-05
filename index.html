@@ -402,5 +402,15 @@
   <!-- Firebase and App Scripts -->
   <script src="firebase-config.js"></script>
   <script src="script.js"></script>
+  
+  <div id="newsPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:999999;">
+  <div style="height:50px; background:#f1f1f1; display:flex; align-items:center; padding:0 15px; border-bottom:1px solid #ddd;">
+    <button onclick="closeNews()" style="border:none; background:none; font-size:20px; cursor:pointer;">
+      <i class="fas fa-arrow-left"></i> ফিরে যান
+    </button>
+    <span id="popupTitle" style="margin-left:15px; font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">খবর পড়ছেন...</span>
+  </div>
+  <iframe id="newsFrame" src="" style="width:100%; height:calc(100% - 50px); border:none;"></iframe>
+</div>
 </body>
 </html>
